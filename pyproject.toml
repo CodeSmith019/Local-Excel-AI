@@ -1,0 +1,43 @@
+[project]
+name = "excel-ai"
+version = "0.1.0"
+description = "Local LLM Excel AI"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sse-starlette",
+    "pydantic",
+    "pydantic-settings",
+    "langgraph",
+    "langchain-core",
+    "langchain-openai",
+    "langgraph-checkpoint-sqlite",
+    "xlwings",
+    "pywin32; sys_platform == 'win32'",
+    "pandas",
+    "openpyxl",
+    "httpx",
+    "pyyaml",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "excel: needs a running Microsoft Excel (Windows)",
+]

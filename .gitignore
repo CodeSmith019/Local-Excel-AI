@@ -1,63 +1,25 @@
-# Python virtual environments
-venv/
+# Virtual environment
 .venv/
-env/
-ENV/
+venv/
 
-# Large model binaries and llama.cpp executables (Per PROJECT_CONTEXT.md)
+# Caches
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+
+# Local runtime data and logs
+data/
+
+# Model binaries and llama-server executables
 models/
 llama/
 *.gguf
-*.bin
-*.pt
-*.onnx
 
-# Data, SQLite databases, logs, benchmarks, and evals (Per PROJECT_CONTEXT.md)
-data/
-*.sqlite
-*.sqlite3
-*.db
-*.log
+# Add-in certificates (Phase 10)
+addin/certs/
 
-# Environment configs and secrets
+# Local environment variables (config/dell.env and config/yoga.env are tracked)
 .env
-config/*.env
-!config/*.env.example
 .env.*
 !.env.example
-
-# Python caches and build artifacts
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Testing & Linting cache
-.pytest_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-.mypy_cache/
-
-# OS / Editor files
-.vscode/
-.idea/
-Thumbs.db
-[Dd]esktop.ini
-.DS_Store
-
