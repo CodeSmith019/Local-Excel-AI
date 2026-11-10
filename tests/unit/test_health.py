@@ -26,6 +26,8 @@ def test_health_reachable(client: TestClient, monkeypatch: pytest.MonkeyPatch) -
     assert data["llm"]["reachable"] is True
     assert data["llm"]["model"] == "mock-qwen-model"
     assert data["llm"]["error"] is None
+    assert "excel" in data
+    assert "connected" in data["excel"]
 
 
 def test_health_unreachable(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -46,6 +48,7 @@ def test_health_unreachable(client: TestClient, monkeypatch: pytest.MonkeyPatch)
     assert data["llm"]["model"] is None
     assert data["llm"]["error"] is not None
     assert "ConnectError" in data["llm"]["error"]
+    assert "excel" in data
 
 
 def test_health_json_shape(client: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -64,11 +67,13 @@ def test_health_json_shape(client: TestClient, monkeypatch: pytest.MonkeyPatch) 
     assert response.status_code == 200
     data = response.json()
 
-    assert set(data.keys()) == {"backend", "machine", "llm"}
+    assert set(data.keys()) == {"backend", "machine", "llm", "excel"}
     assert set(data["llm"].keys()) == {"reachable", "model", "error"}
+    assert set(data["excel"].keys()) == {"connected", "workbook", "sheet", "error"}
     assert isinstance(data["backend"], str)
     assert isinstance(data["machine"], str)
     assert isinstance(data["llm"]["reachable"], bool)
+    assert isinstance(data["excel"]["connected"], bool)
 
 
 def test_root_serves_frontend(client: TestClient) -> None:
@@ -76,4 +81,3 @@ def test_root_serves_frontend(client: TestClient) -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert "Excel AI" in response.text
-

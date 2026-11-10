@@ -1,0 +1,442 @@
+# Evaluation Prompts for Local LLM Excel AI
+# Tier 1: 15 cases, Tier 2: 13 cases, Tier 3: 12 cases, Unsupported: 3 cases. Total: 43 cases.
+# Expected values hand-calculated from section 12 fixture data.
+
+# ==============================================================================
+# Tier 1: Text Transformations (15 cases)
+# ==============================================================================
+
+- id: t1_headers_camel
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Convert all the column headers to camelCase"
+  expected_op: convert_case_style
+  expected:
+    A1: empId
+    B1: fullName
+    C1: department
+    G1: joinDate
+  must_not_change: ["A2:J11"]
+
+- id: t1_headers_snake
+  tier: 1
+  fixture: sales.xlsx
+  instruction: "make all headers snake_case"
+  expected_op: convert_case_style
+  expected:
+    A1: order_id
+    D1: qty
+    E1: unit_price
+    F1: order_date
+  must_not_change: ["A2:J11"]
+
+- id: t1_headers_kebab
+  tier: 1
+  fixture: sales.xlsx
+  instruction: "change headers to kebab-case"
+  expected_op: convert_case_style
+  expected:
+    A1: order-id
+    E1: unit-price
+    F1: order-date
+  must_not_change: ["A2:J11"]
+
+- id: t1_dept_upper_informal
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "pls make dept caps"
+  expected_op: change_case
+  expected:
+    C2: SALES
+    C3: ENGINEERING
+    C4: MARKETING
+    C9: HR
+  must_not_change: ["A2:B11", "D2:J11"]
+
+- id: t1_name_title
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Put Full Name in title case"
+  expected_op: change_case
+  expected:
+    B2: "  John Smith "
+    B3: Priya Sharma
+    B6: Li Wei
+
+- id: t1_region_lower
+  tier: 1
+  fixture: sales.xlsx
+  instruction: "make the Region column lowercase"
+  expected_op: change_case
+  expected:
+    B2: north
+    B3: south
+    B4: east
+    B5: west
+
+- id: t1_col_c_upper_letter
+  tier: 1
+  fixture: sales.xlsx
+  instruction: "convert column C to uppercase"
+  expected_op: change_case
+  expected:
+    C2: LAPTOP
+    C3: MOUSE
+    C4: MONITOR
+    C5: KEYBOARD
+
+- id: t1_trim_fullname
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Remove extra spaces in Full Name"
+  expected_op: trim_whitespace
+  expected:
+    B2: john smith
+    B4: carlos mendez
+    B11: Sara Lee
+
+- id: t1_trim_col_b_letter
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Clean up whitespace in column B"
+  expected_op: trim_whitespace
+  expected:
+    B2: john smith
+    B4: carlos mendez
+    B11: Sara Lee
+
+- id: t1_find_replace_status
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Replace Inactive with Former in Status"
+  expected_op: find_replace
+  expected:
+    I4: Former
+    I7: Former
+    I11: Former
+  must_not_change: ["A2:H11", "J2:J11"]
+
+- id: t1_find_replace_city_nyc
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Change New York to NYC in City"
+  expected_op: find_replace
+  expected:
+    H2: NYC
+    H10: NYC
+
+- id: t1_prefix_empid
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Add EMP- before every Emp ID"
+  expected_op: add_prefix_suffix
+  expected:
+    A2: EMP-101
+    A3: EMP-102
+    A11: EMP-110
+
+- id: t1_suffix_city_hq
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Add ' (HQ)' after each City"
+  expected_op: add_prefix_suffix
+  expected:
+    H2: New York (HQ)
+    H3: Pune (HQ)
+    H5: Chicago (HQ)
+
+- id: t1_remove_symbols_phone
+  tier: 1
+  fixture: employees.xlsx
+  instruction: "Keep only digits in the Phone column"
+  expected_op: remove_characters
+  expected:
+    E2: "5551234567"
+    E3: "5559876543"
+    E5: "15554445555"
+    E6: "5556667777"
+
+- id: t1_remove_digits_order_id
+  tier: 1
+  fixture: sales.xlsx
+  instruction: "Remove digits from Order ID"
+  expected_op: remove_characters
+  expected:
+    A2: "SO-"
+    A3: "SO-"
+    A11: "SO-"
+
+# ==============================================================================
+# Tier 2: Structural Changes (13 cases)
+# ==============================================================================
+
+- id: t2_sort_salary_desc
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Sort by Salary, highest first"
+  expected_op: sort_rows
+  expected:
+    A2: 105
+    F2: 83000
+    A3: 102
+    F3: 78000
+    A5: 109
+    F5: 67000
+
+- id: t2_sort_qty_asc
+  tier: 2
+  fixture: sales.xlsx
+  instruction: "sort orders by Qty ascending"
+  expected_op: sort_rows
+  expected:
+    A2: SO-1005
+    D2: 1
+    A3: SO-1001
+    D3: 2
+    A4: SO-1008
+    D4: 2
+
+- id: t2_filter_inactive
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Delete rows where Status is Inactive"
+  expected_op: filter_rows
+  expected:
+    A2: 101
+    A3: 102
+    A4: 104
+    A5: 105
+    A6: 107
+    A7: 108
+    A8: 109
+
+- id: t2_filter_sales_region
+  tier: 2
+  fixture: sales.xlsx
+  instruction: "Keep only North region rows"
+  expected_op: filter_rows
+  expected:
+    A2: SO-1001
+    B2: North
+    A3: SO-1005
+    B3: North
+    A4: SO-1009
+    B4: North
+
+- id: t2_remove_dupes_email_informal
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "get rid of the dupes by email"
+  expected_op: remove_duplicates
+  expected:
+    A8: 108
+    D8: elena.petrova@acme.com
+
+- id: t2_insert_col_bonus
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Add a column called Bonus after Salary"
+  expected_op: insert_column
+  expected:
+    F1: Salary
+    G1: Bonus
+    H1: Join Date
+
+- id: t2_insert_col_notes_end
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Insert an empty Notes column at the end"
+  expected_op: insert_column
+  expected:
+    K1: Notes
+
+- id: t2_delete_rating
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Delete the Rating column"
+  expected_op: delete_column
+  expected:
+    I1: Status
+
+- id: t2_rename_empid
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Rename Emp ID to Employee ID"
+  expected_op: rename_column
+  expected:
+    A1: Employee ID
+  must_not_change: ["A2:J11"]
+
+- id: t2_move_email_next_to_name
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Move Email next to Full Name"
+  expected_op: move_column
+  expected:
+    B1: Full Name
+    C1: Email
+    D1: Department
+    C2: john.smith@acme.com
+
+- id: t2_fill_blanks_city
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Fill empty City cells with Unknown"
+  expected_op: fill_blanks
+  expected:
+    H4: Unknown
+    H7: Unknown
+    H2: New York
+
+- id: t2_fill_blanks_col_j_letter
+  tier: 2
+  fixture: sales.xlsx
+  instruction: "fill blanks in column J with None"
+  expected_op: fill_blanks
+  expected:
+    J3: "None"
+    J5: "None"
+    J2: urgent delivery
+
+- id: t2_highlight_salaries
+  tier: 2
+  fixture: employees.xlsx
+  instruction: "Highlight salaries above 60000 in green"
+  expected_op: highlight_cells
+  must_not_change: ["A1:J11"]
+
+# ==============================================================================
+# Tier 3: Formula Generation (12 cases)
+# ==============================================================================
+
+- id: t3_total_qty_price
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Add a Total column that multiplies Qty by Unit Price"
+  expected_op: add_formula_column
+  expected:
+    K1: Total
+    K2: 1700
+    K3: 187.5
+    K4: 840
+
+- id: t3_discounted_total
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Add Net Amount = Qty * Unit Price * (1 - Discount)"
+  expected_op: add_formula_column
+  expected:
+    K1: Net Amount
+    K2: 1615
+    K3: 187.5
+
+- id: t3_order_month
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Add Order Month from Order Date"
+  expected_op: add_formula_column
+  expected:
+    K1: Order Month
+    K2: 1
+    K5: 2
+    K8: 3
+
+- id: t3_order_year
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Add a Year column extracted from Order Date"
+  expected_op: add_formula_column
+  expected:
+    K1: Year
+    K2: 2026
+    K3: 2026
+
+- id: t3_first_name_formula
+  tier: 3
+  fixture: employees.xlsx
+  instruction: "Add First Name column taking the left text before space from Full Name"
+  expected_op: add_formula_column
+  expected:
+    K1: First Name
+    K3: PRIYA
+    K5: Aisha
+
+- id: t3_tenure_years_volatile
+  tier: 3
+  fixture: employees.xlsx
+  instruction: "Add a Tenure column showing years between Join Date and today"
+  expected_op: add_formula_column
+  volatile: true
+  expected:
+    K1: Tenure
+
+- id: t3_days_since_order_volatile
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Add Days Since Order column calculated as today minus Order Date"
+  expected_op: add_formula_column
+  volatile: true
+  expected:
+    K1: Days Since Order
+
+- id: t3_sum_qty
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Add the total of Qty below the table"
+  expected_op: add_summary_formula
+  expected:
+    D13: 75
+
+- id: t3_avg_salary
+  tier: 3
+  fixture: employees.xlsx
+  instruction: "Calculate average salary below the Salary column"
+  expected_op: add_summary_formula
+  expected:
+    F13: 62650
+
+- id: t3_count_paid_orders
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Count how many orders are paid"
+  expected_op: add_summary_formula
+  expected:
+    H13: 7
+
+- id: t3_sum_north_qty
+  tier: 3
+  fixture: sales.xlsx
+  instruction: "Total Qty for the North region"
+  expected_op: add_summary_formula
+  expected:
+    D13: 11
+
+- id: t3_max_salary
+  tier: 3
+  fixture: employees.xlsx
+  instruction: "Put the highest salary below the table"
+  expected_op: add_summary_formula
+  expected:
+    F13: 83000
+
+# ==============================================================================
+# Tier 0 / Unsupported Requests (3 cases)
+# ==============================================================================
+
+- id: unsupported_chart
+  tier: 0
+  fixture: sales.xlsx
+  instruction: "Draw a pie chart of sales by region"
+  expected_op: unsupported
+
+- id: unsupported_pivot
+  tier: 0
+  fixture: sales.xlsx
+  instruction: "Create a pivot table of product sales by customer"
+  expected_op: unsupported
+
+- id: unsupported_vba
+  tier: 0
+  fixture: employees.xlsx
+  instruction: "Write a VBA macro to send email alerts to inactive employees"
+  expected_op: unsupported

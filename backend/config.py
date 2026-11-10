@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     data_dir: Path = Path("data")
     max_retries: int = 2
     max_prompt_rows: int = 30
+    formula_trial_run: bool = True
+    ssl_certfile: str | None = None
+    ssl_keyfile: str | None = None
 
 
 @lru_cache

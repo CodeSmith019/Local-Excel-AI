@@ -79,6 +79,75 @@ You will see the placeholder status page showing health details retrieved from `
 
 ---
 
+## 🎬 Demo Day Checklist (One-Click Start & Excel Task Pane)
+
+Use this checklist for a live or offline demonstration of Excel AI:
+
+### 1. Prerequisites (One-Time Setup)
+- Ensure certificates are installed and trusted:
+  ```powershell
+  npx office-addin-dev-certs install
+  ```
+- Ensure the Excel Add-in is sideloaded via Shared Folder Catalog (see [docs/ADDIN_SETUP.md](docs/ADDIN_SETUP.md)).
+- If testing offline capability, **turn Wi-Fi OFF**.
+
+### 2. One-Click Cold Start
+Launch all components with one command:
+- **Dell G15**:
+  ```powershell
+  scripts\start_all.bat dell https
+  ```
+- **Yoga Pro 7**:
+  ```powershell
+  scripts\start_all.bat yoga https
+  ```
+*This starts `llama-server` minimized, polls `/health` until ready, launches the HTTPS backend on port 8443, and opens Microsoft Excel.*
+
+### 3. Open Test Workbook & Task Pane
+1. In Excel, open one of the generated test workbooks:
+   - `tests\fixtures\employees.xlsx`
+   - or `tests\fixtures\sales.xlsx`
+2. On the Excel ribbon **Home** tab, click the **Excel AI** button.
+3. Verify both status dots in the task pane header are **green**:
+   - 🟢 **Model**: `Qwen2.5-Coder-7B-Instruct-Q4_K_M` (or `gpt-oss-20b-mxfp4`)
+   - 🟢 **Excel**: Connected to active workbook and sheet
+
+### 4. Run Example Demo Instructions
+
+#### Tier 1 — Text Transformation
+- **Instruction**: `Convert headers to camelCase`
+- **What happens**:
+  - Agent classifies intent to `convert_case_style` (`style="camel"`).
+  - Displays plan and side-by-side diff preview for all 10 headers (e.g. `Emp ID` -> `empId`, `Full Name` -> `fullName`).
+  - Click **Approve**: changes are applied instantly in Excel.
+
+#### Tier 2 — Structural Operations
+- **Instruction**: `Sort by Salary, highest first`
+- **What happens**:
+  - Agent selects `sort_rows` (`by_column="Salary"`, `descending=True`).
+  - Displays plan and preview showing reordered employee rows.
+  - Click **Approve**: rows are sorted directly in Excel.
+
+#### Tier 3 — Formula Computation
+- Open `tests\fixtures\sales.xlsx` (or switch to Sales sheet).
+- **Instruction**: `Add a Total column that multiplies Qty by Unit Price`
+- **What happens**:
+  - Agent selects `add_formula_column` (`header="Total"`, `formula="=D2*E2"`).
+  - Trial-runs formula in Excel scratch area and previews computed values (e.g. `1700`, `187.5`).
+  - Click **Approve**: new column `Total` is inserted with formulas and computed values.
+
+#### Complete Undo Rollback
+- Click the **Undo** button in the task pane header (or type `Undo`).
+- **What happens**: The snapshot engine rolls back the sheet to its exact prior state.
+
+### 5. Clean Shutdown
+When the demonstration is complete, stop all background services:
+```powershell
+scripts\stop_all.bat
+```
+
+---
+
 ## 🧪 Testing and Code Quality
 
 Run the test suite:
@@ -94,6 +163,41 @@ Run code formatting and lint checks:
 ```powershell
 uv run ruff check .
 ```
+
+---
+
+## 📊 Results
+
+### Running the Evaluation Benchmark
+
+The evaluation benchmark evaluates accuracy (intent classification, parameter extraction, and resulting cell values) and latency across Tier 1 (text transforms), Tier 2 (structural modifications), Tier 3 (formula generation), and unsupported requests using 43 hand-verified cases in `tests/eval/eval_prompts.yaml`.
+
+```powershell
+# Run full evaluation benchmark on the active hardware profile
+uv run python tests/eval/run_eval.py
+
+# Quick check on a single tier (e.g. Tier 1)
+uv run python tests/eval/run_eval.py --tier 1
+
+# Filter by case IDs or glob pattern
+uv run python tests/eval/run_eval.py --cases "t1_*,t3_total_*"
+
+# Custom model label, repetitions, or fail-fast
+uv run python tests/eval/run_eval.py --model-label qwen2.5-coder-7b-instruct-q4_k_m --repeat 1 --fail-fast
+
+# Compare multiple evaluation runs from data/eval/*.csv
+uv run python scripts/compare_runs.py
+```
+
+Evaluation outputs are saved to `data/eval/<machine>_<model_label>_<YYYYmmdd_HHMMSS>.csv` and a companion Markdown report.
+
+### Benchmark Results
+
+| Machine | Model | Tier 1 Acc | Tier 2 Acc | Tier 3 Acc | Overall Acc | Median Latency (T1 / T2 / T3) | Retries / Case |
+|---|---|---|---|---|---|---|---|
+| `dell-g15` | `qwen2.5-coder-7b-instruct-q4_k_m` | 86.7% | 84.6% | 75.0% | 83.7% | 7854ms / 3966ms / 7441ms | 0.00 |
+| `yoga-pro-7` | `gpt-oss-20b-mxfp4` | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* |
+| `yoga-pro-7` | `qwen2.5-coder-7b-instruct-q4_k_m` | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* |
 
 ---
 
