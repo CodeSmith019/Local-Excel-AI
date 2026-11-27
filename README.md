@@ -10,11 +10,9 @@
 - **Python**: Python 3.12 (managed via `uv`)
 - **Package Manager**: [uv](https://github.com/astral-sh/uv) (>= 0.5.0)
 - **Spreadsheet**: Microsoft Excel desktop (Windows) with calculation set to Automatic
-- **Local LLM Engine**:
-  - `llama-server.exe` placed in `llama/`
-  - Model weights placed in `models/`:
-    - Dell G15: `models/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf`
-    - Yoga Pro 7: `models/gpt-oss-20b-mxfp4.gguf` (and optionally Qwen 7B for parity tests)
+- **Local LLM Engine and Model**
+  - Set up the `llama.cpp` server separately. The repository omits the server binary. Place `llama-server.exe` in `llama/`.
+  - Download `Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf` separately and place it in `models/`.
 
 ---
 
@@ -43,30 +41,19 @@
 
 ### 1. Start `llama-server`
 
-Open a terminal and run the startup script for your hardware profile:
+Open a terminal and run the startup script for the Dell G15 (NVIDIA GPU) profile.
 
-- **Dell G15 (NVIDIA GPU)**:
-  ```powershell
-  scripts\start_llm_dell.bat
-  ```
-- **Yoga Pro 7 (AMD / Integrated / Parity)**:
-  ```powershell
-  scripts\start_llm_yoga.bat
-  ```
-  *(To run in parity mode with the Qwen 7B model on Yoga, run: `scripts\start_llm_yoga.bat qwen`)*
+```powershell
+scripts\start_llm_dell.bat
+```
 
 ### 2. Start the FastAPI Backend
 
-Open a second terminal and start the backend with your profile:
+Open a second terminal and start the backend with the Dell G15 profile.
 
-- **Dell G15**:
-  ```powershell
-  scripts\start_backend.bat dell
-  ```
-- **Yoga Pro 7**:
-  ```powershell
-  scripts\start_backend.bat yoga
-  ```
+```powershell
+scripts\start_backend.bat dell
+```
 
 The backend starts at `http://127.0.0.1:8000/`.
 
@@ -92,15 +79,12 @@ Use this checklist for a live or offline demonstration of Excel AI:
 - If testing offline capability, **turn Wi-Fi OFF**.
 
 ### 2. One-Click Cold Start
-Launch all components with one command:
-- **Dell G15**:
-  ```powershell
-  scripts\start_all.bat dell https
-  ```
-- **Yoga Pro 7**:
-  ```powershell
-  scripts\start_all.bat yoga https
-  ```
+Launch all components with the Dell G15 profile.
+
+```powershell
+scripts\start_all.bat dell https
+```
+
 *This starts `llama-server` minimized, polls `/health` until ready, launches the HTTPS backend on port 8443, and opens Microsoft Excel.*
 
 ### 3. Open Test Workbook & Task Pane
@@ -109,7 +93,7 @@ Launch all components with one command:
    - or `tests\fixtures\sales.xlsx`
 2. On the Excel ribbon **Home** tab, click the **Excel AI** button.
 3. Verify both status dots in the task pane header are **green**:
-   - 🟢 **Model**: `Qwen2.5-Coder-7B-Instruct-Q4_K_M` (or `gpt-oss-20b-mxfp4`)
+   - 🟢 **Model**: `Qwen2.5-Coder-7B-Instruct-Q4_K_M`
    - 🟢 **Excel**: Connected to active workbook and sheet
 
 ### 4. Run Example Demo Instructions
@@ -196,8 +180,6 @@ Evaluation outputs are saved to `data/eval/<machine>_<model_label>_<YYYYmmdd_HHM
 | Machine | Model | Tier 1 Acc | Tier 2 Acc | Tier 3 Acc | Overall Acc | Median Latency (T1 / T2 / T3) | Retries / Case |
 |---|---|---|---|---|---|---|---|
 | `dell-g15` | `qwen2.5-coder-7b-instruct-q4_k_m` | 86.7% | 84.6% | 75.0% | 83.7% | 7854ms / 3966ms / 7441ms | 0.00 |
-| `yoga-pro-7` | `gpt-oss-20b-mxfp4` | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* |
-| `yoga-pro-7` | `qwen2.5-coder-7b-instruct-q4_k_m` | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* |
 
 ---
 

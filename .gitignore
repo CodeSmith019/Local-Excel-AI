@@ -42,6 +42,9 @@ addin/certs/
 # User test scratchpad
 user_tests/
 
+# Local project report
+/report/Excel_AI_Mini_Project_Report.pdf
+
 # Local environment variables (config/dell.env and config/yoga.env are tracked)
 .env
 .env.*
